@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore di Curriculum per Lavoro Estivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-section {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+        .cv-preview {
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Stili per la stampa aggiornati */
+        @page {
+            size: auto;
+            margin: 0; /* Rimuove header e footer del browser */
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #cv-preview-container, #cv-preview-container * {
+                visibility: visible;
+            }
+            #cv-preview-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 1.5cm; /* Aggiunge un margine interno per la stampa */
+                border: none;
+                box-shadow: none;
+                box-sizing: border-box;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8 no-print">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Generatore di Curriculum per Lavoro Estivo</h1>
+            <p class="text-md text-gray-600 mt-2">Compila i campi qui sotto per creare e visualizzare in anteprima il tuo CV.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Colonna del Form -->
+            <div class="no-print">
+                <div id="cv-form" class="space-y-6">
+                    <!-- Dati Personali -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Dati Personali</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="nome_cognome" placeholder="Nome e Cognome" class="p-2 border rounded-md w-full">
+                            <input type="email" id="email" placeholder="Email" class="p-2 border rounded-md w-full">
+                            <input type="tel" id="telefono" placeholder="Telefono" class="p-2 border rounded-md w-full">
+                            <input type="text" id="indirizzo" placeholder="Indirizzo, Città, CAP" class="p-2 border rounded-md w-full">
+                        </div>
+                    </div>
+
+                    <!-- Obiettivo Professionale -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Obiettivo Professionale</h2>
+                        <textarea id="obiettivo" placeholder="Es: Studente dinamico e responsabile, alla ricerca di un lavoro estivo nel settore della ristorazione per mettere a frutto le mie capacità relazionali..." class="p-2 border rounded-md w-full h-24"></textarea>
+                    </div>
+
+                    <!-- Istruzione -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Istruzione</h2>
+                        <div id="istruzione-list" class="space-y-4">
+                            <div class="istruzione-item grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" placeholder="Titolo di studio (es. Diploma di Liceo)" class="istruzione-titolo p-2 border rounded-md">
+                                <input type="text" placeholder="Istituto e Città" class="istruzione-istituto p-2 border rounded-md">
+                                <input type="text" placeholder="Periodo (es. 2020 - in corso)" class="istruzione-periodo p-2 border rounded-md">
+                                <input type="text" placeholder="Voto (es. 95/100)" class="istruzione-voto p-2 border rounded-md">
+                            </div>
+                        </div>
+                        <button onclick="addIstruzione()" class="mt-4 text-sm bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md">+ Aggiungi Istruzione</button>
+                    </div>
+
+                    <!-- Esperienze Lavorative -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Esperienze Lavorative</h2>
+                        <div id="esperienze-list" class="space-y-4">
+                            <div class="esperienza-item space-y-2">
+                                <input type="text" placeholder="Ruolo (es. Cameriere)" class="esperienza-ruolo p-2 border rounded-md w-full">
+                                <input type="text" placeholder="Azienda e Luogo" class="esperienza-azienda p-2 border rounded-md w-full">
+                                <input type="text" placeholder="Periodo (es. Giu 2024 - Ago 2024)" class="esperienza-periodo p-2 border rounded-md w-full">
+                                <textarea placeholder="Descrizione delle mansioni..." class="esperienza-descrizione p-2 border rounded-md w-full h-20"></textarea>
+                            </div>
+                        </div>
+                        <button onclick="addEsperienza()" class="mt-4 text-sm bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md">+ Aggiungi Esperienza</button>
+                    </div>
+                    
+                    <!-- Competenze -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Competenze</h2>
+                        <textarea id="competenze" placeholder="Elenca le tue competenze, separate da una virgola (es. Lavoro di squadra, Flessibilità, Pacchetto Office...)" class="p-2 border rounded-md w-full h-24"></textarea>
+                    </div>
+                    
+                    <!-- Lingue -->
+                    <div class="form-section p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Lingue</h2>
+                        <textarea id="lingue" placeholder="Elenca le lingue e il livello (es. Inglese: B2, Francese: A2...)" class="p-2 border rounded-md w-full h-20"></textarea>
+                    </div>
+
+                    <button onclick="generatePreview()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                        Aggiorna Anteprima CV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Colonna dell'Anteprima CV -->
+            <div id="cv-preview-container" class="bg-white p-8 md:p-12 rounded-lg cv-preview">
+                 <div class="text-center text-gray-400 flex items-center justify-center h-full">
+                    <p>L'anteprima del tuo CV apparirà qui...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funzione per generare l'anteprima del CV
+        function generatePreview() {
+            const nome = document.getElementById('nome_cognome').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const indirizzo = document.getElementById('indirizzo').value;
+            const obiettivo = document.getElementById('obiettivo').value;
+            const competenze = document.getElementById('competenze').value.split(',').map(item => item.trim());
+            const lingue = document.getElementById('lingue').value;
+
+            // Raccoglie dati da istruzione
+            const istruzioneItems = document.querySelectorAll('.istruzione-item');
+            let istruzioneHtml = '';
+            istruzioneItems.forEach(item => {
+                const titolo = item.querySelector('.istruzione-titolo').value;
+                const istituto = item.querySelector('.istruzione-istituto').value;
+                const periodo = item.querySelector('.istruzione-periodo').value;
+                const voto = item.querySelector('.istruzione-voto').value;
+                if (titolo || istituto) {
+                    istruzioneHtml += `
+                        <div class="mb-4">
+                            <h4 class="font-semibold">${titolo}</h4>
+                            <p class="text-sm text-gray-700">${istituto}</p>
+                            <p class="text-sm text-gray-500">${periodo}</p>
+                            ${voto ? `<p class="text-sm text-gray-500">Votazione: ${voto}</p>` : ''}
+                        </div>
+                    `;
+                }
+            });
+
+            // Raccoglie dati da esperienze
+            const esperienzeItems = document.querySelectorAll('.esperienza-item');
+            let esperienzeHtml = '';
+            esperienzeItems.forEach(item => {
+                const ruolo = item.querySelector('.esperienza-ruolo').value;
+                const azienda = item.querySelector('.esperienza-azienda').value;
+                const periodo = item.querySelector('.esperienza-periodo').value;
+                const descrizione = item.querySelector('.esperienza-descrizione').value;
+                if (ruolo || azienda) {
+                    esperienzeHtml += `
+                        <div class="mb-4">
+                            <h4 class="font-semibold">${ruolo}</h4>
+                            <p class="text-sm text-gray-700">${azienda}</p>
+                            <p class="text-sm text-gray-500">${periodo}</p>
+                            <p class="text-sm mt-1">${descrizione.replace(/\n/g, '<br>')}</p>
+                        </div>
+                    `;
+                }
+            });
+
+            // Costruisce l'HTML del CV
+            const previewContainer = document.getElementById('cv-preview-container');
+            previewContainer.innerHTML = `
+                <div class="text-center border-b pb-4 mb-6">
+                    <h1 class="text-3xl font-bold text-gray-900">${nome}</h1>
+                    <p class="text-sm text-gray-600 mt-2">
+                        ${indirizzo ? `<span>${indirizzo}</span> &bull;` : ''}
+                        ${telefono ? `<span>${telefono}</span> &bull;` : ''}
+                        ${email ? `<span>${email}</span>` : ''}
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    ${obiettivo ? `
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-1 mb-2">OBIETTIVO</h3>
+                        <p class="text-sm">${obiettivo}</p>
+                    </div>` : ''}
+
+                    ${esperienzeHtml ? `
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-1 mb-2">ESPERIENZE LAVORATIVE</h3>
+                        ${esperienzeHtml}
+                    </div>` : ''}
+
+                    ${istruzioneHtml ? `
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-1 mb-2">ISTRUZIONE</h3>
+                        ${istruzioneHtml}
+                    </div>` : ''}
+
+                    ${competenze.length > 0 && competenze[0] ? `
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-1 mb-2">COMPETENZE</h3>
+                        <ul class="list-disc list-inside grid grid-cols-2 gap-x-4 text-sm">
+                            ${competenze.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>` : ''}
+                    
+                    ${lingue ? `
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-1 mb-2">LINGUE</h3>
+                        <p class="text-sm">${lingue.replace(/\n/g, '<br>')}</p>
+                    </div>` : ''}
+                </div>
+                
+                <div class="text-xs text-gray-400 mt-8 pt-4 border-t">
+                    <p>Autorizzo il trattamento dei miei dati personali presenti nel cv ai sensi del Decreto Legislativo 30 giugno 2003, n. 196 ‘Codice in materia di protezione dei dati personali’ e dell’art. 13 del GDPR (Regolamento UE 2016/679).</p>
+                </div>
+                
+                <button onclick="window.print()" class="no-print w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Stampa / Salva in PDF
+                </button>
+            `;
+        }
+
+        // Funzione per aggiungere un nuovo blocco istruzione
+        function addIstruzione() {
+            const list = document.getElementById('istruzione-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'istruzione-item grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t mt-4';
+            newItem.innerHTML = `
+                <input type="text" placeholder="Titolo di studio" class="istruzione-titolo p-2 border rounded-md">
+                <input type="text" placeholder="Istituto e Città" class="istruzione-istituto p-2 border rounded-md">
+                <input type="text" placeholder="Periodo" class="istruzione-periodo p-2 border rounded-md">
+                <input type="text" placeholder="Voto" class="istruzione-voto p-2 border rounded-md">
+            `;
+            list.appendChild(newItem);
+        }
+
+        // Funzione per aggiungere un nuovo blocco esperienza
+        function addEsperienza() {
+            const list = document.getElementById('esperienze-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'esperienza-item space-y-2 pt-4 border-t mt-4';
+            newItem.innerHTML = `
+                <input type="text" placeholder="Ruolo" class="esperienza-ruolo p-2 border rounded-md w-full">
+                <input type="text" placeholder="Azienda e Luogo" class="esperienza-azienda p-2 border rounded-md w-full">
+                <input type="text" placeholder="Periodo" class="esperienza-periodo p-2 border rounded-md w-full">
+                <textarea placeholder="Descrizione delle mansioni..." class="esperienza-descrizione p-2 border rounded-md w-full h-20"></textarea>
+            `;
+            list.appendChild(newItem);
+        }
+        
+        // Genera un'anteprima vuota all'avvio
+        generatePreview();
+    </script>
+</body>
+</html>
